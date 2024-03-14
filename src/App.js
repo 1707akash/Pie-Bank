@@ -1,10 +1,12 @@
 
 import './App.css';
+import Home from './Screen/Home';
+
 
 function App() {
   return (
     <>
-      <h1>Pie-Bank</h1>
+      <Home />
     </>
   );
 }
