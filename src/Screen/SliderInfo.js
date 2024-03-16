@@ -22,7 +22,7 @@ const SliderInfo = ({min, max, value, symbol, title, setValue}) => {
         getAriaValueText={valuetext}
         valueLabelDisplay="auto"
         shiftStep={30}
-        step={1}
+        step={10}
         marks
         min={min}
         max={max}

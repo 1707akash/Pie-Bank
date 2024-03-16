@@ -1,39 +1,85 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../Component/Navbar";
 import SliderInfo from "./SliderInfo";
+import Select from "../Component/Select";
+import Chart from "chart.js/auto";
+import { CategoryScale } from "chart.js";
+import PieChart from "../Component/PieChart";
+import { Pagination } from '@mui/material';
 
-const Home = () => {
+Chart.register(CategoryScale);
 
-    const[homeValue, setHomeValue] = useState(1700);
-    const[downPayment, setDownPayment] = useState(600);
-    const[loanAmount, setLoanAmount] = useState(2400);
-    const[interestRate, setInterestRate] =useState(6);
+
+const Home = () => {  
+
+  const [homevalue, setHomeValue] = useState(1700);  
+  const [downPaymentValue, setDownPaymentValue] = useState(180);  
+  const [loanAmountValue, setLoanAmountValue] = useState(1520);  
+  const [interestValue, setInterestValue] = useState(2); // Yearly
+  const [tenureParent, setTenureParent] = useState();
+  const [monthlyInterest, setMonthlyInterest] = useState();
+
+  const [chartData, setChartData] = useState({
+    labels: ["Principal", "Interest"], 
+    datasets: [
+      {
+        label: "Monthly Payment",
+        data: [homevalue, 230],
+        backgroundColor: [
+          "#F00F00",
+          "#FCFCFC",  
+        ],
+        borderColor: "black",
+        borderWidth: 2
+      }
+    ]
+  })
+
+
+  
+  useEffect(()=>{
+    // Update the downPaymentValue : 20% of current homevalue
+    const downPayment = homevalue * 0.20
+    setDownPaymentValue(downPayment)
+
+    // Update the loanAmountValue : homevalue - downPaymentValue
+    const loanAmount = homevalue - downPaymentValue
+    setLoanAmountValue(loanAmount)
+  },[homevalue])
+
+
+  useEffect(()=>{
+    const r = interestValue/12;
+    const n = tenureParent * 12;
+    const EMI = (loanAmountValue * r * (1 + r)^n) / ((1 + r)^n - 1)
+    setMonthlyInterest(EMI)
+  },[loanAmountValue, interestValue, tenureParent])
+
   return (
     <>
-        <Navbar />
-        <div style={{display:"flex"}}>
-        {/* SLider Div */}
-            <div style={{width:"50%" , padding:'0px 1rem'}}>
-            <SliderInfo setValue = {setHomeValue} title={"Home Value"} symbol={"$"} value={homeValue} min={1000} max={10000} />
-
-            <SliderInfo setValue={setDownPayment} title={"Down Payment"} symbol={"$"} value={downPayment} min={0} max={homeValue} />
-
-            <SliderInfo setValue={setLoanAmount} title={"Loan Amount"} symbol={"$"} value={loanAmount} min={0} max={homeValue} />
-
-            <SliderInfo setValue={setInterestRate} title={"Interest Rate"} symbol={"%"} value={interestRate} min={2} max={20} />
+        <Navbar/>
+        <div
+            style={{
+                display:'flex'
+            }}
+        >
+            {/* Sliders */}
+            <div style={{width: '50%', padding: '0px 10px'}}>
+                <SliderInfo title={"Home Value"} symbol={"$"} setValue={setHomeValue} value={homevalue} min={1000} max={10000}/>
+                <SliderInfo title={"Down Payment"} symbol={"$"} setValue={setDownPaymentValue} value={downPaymentValue} min={0} max={homevalue}/>
+                <SliderInfo title={"Loan Amount"} symbol={"$"} setValue={setLoanAmountValue} value={loanAmountValue} min={0} max={homevalue}/>
+                <SliderInfo title={"Interest Rate"} symbol={"%"} setValue={setInterestValue} value={interestValue} min={2} max={18}/>
+                <Select setTenureParent={setTenureParent}/>
             </div>
-
-        {/* Graph Div  */}
-            <div style={{width:"50%"}}>
-                
+            {/* Graph */}
+            <div style={{width: '50%'}}>
+                <PieChart chartData={chartData} />
+                <p>{monthlyInterest}</p>
+                {/* <Pagination count={10} page={4} onChange={(e, pageNo)=>{
+                  console.log("Page", pageNo)
+                }} /> */}
             </div>
-    
         </div>
-
-
-
-        
     </>
   )
 }
